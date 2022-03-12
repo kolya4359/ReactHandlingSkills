@@ -1,8 +1,8 @@
 import React from 'react';
-import Say from './Say';
+import ValidationSample from './ValidationSample';
 
 const App = () => {
-  return <Say />;
+  return <ValidationSample />;
 };
 
 export default App;
