@@ -12,7 +12,9 @@
     "SharedArrayBuffer": "readonly"
   },
   "parserOptions": {
-    "ecmaVersion": "latest"
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+    // import/export 구문을 사용해도 오류로 간주하지 않도록 설정.
   },
   "rules": {
     "no-unused-vars": "warn",
