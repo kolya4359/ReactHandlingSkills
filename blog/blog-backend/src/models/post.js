@@ -11,6 +11,11 @@ const PostSchema = new Schema({
     type: Date,
     default: Date.now, // 현재 날짜를 기본값으로 지정
   },
+  // 스키마에 사용자 정보를 넣어준다. MongoDB에서는 필요한 데이터를 통째로 집어넣는다.
+  user: {
+    _id: mongoose.Types.ObjectId,
+    username: String,
+  },
 });
 
 /**

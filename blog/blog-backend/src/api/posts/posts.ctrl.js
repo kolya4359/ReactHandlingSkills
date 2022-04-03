@@ -5,10 +5,33 @@ import Joi from 'joi';
 
 const { ObjectId } = mongoose.Types;
 // ObjectId 검증
-export const checkObjectId = (ctx, next) => {
+// id로 포스트를 찾은 후 ctx.state에 담는다. -> 작성자만 포스트를 수정하거나 삭제할 수 있게 하도록 하기 위해서
+export const getPostById = async (ctx, next) => {
   const { id } = ctx.params;
   if (!ObjectId.isVlaid(id)) {
     ctx.status = 400; // Bad Request
+    return;
+  }
+  try {
+    const post = await Post.findById(id);
+    // 포스트가 존재하지 않을 때
+    if (!post) {
+      ctx.status = 404; // Not Found
+      return;
+    }
+    ctx.state.post = post;
+    return next();
+  } catch (e) {
+    ctx.throw(500, e);
+  }
+};
+
+// id로 찾은 포스트가 로그인 중인 사용자가 작성한 포스트인지 확인해 준다.
+// MongoDB 에서 조회한 데이터의 id 값을 문자열과 비교할 때는 반드시 .toString()을 해 주어야 한다.
+export const checkOwnPost = (ctx, next) => {
+  const { user, post } = ctx.state;
+  if (post.user._id.toString() !== user._id) {
+    ctx.status = 403;
     return;
   }
   return next();
@@ -43,6 +66,7 @@ export const write = async (ctx) => {
     title,
     body,
     tags,
+    user: ctx.state.user,
   }); // 포스트의 인스턴스를 만들 때는 new 키워드를 사용한다.
   // 그리고 생성자 함수의 파라미터에 정보를 지닌 객체를 넣는다.
   try {
@@ -61,7 +85,7 @@ export const write = async (ctx) => {
  */
 
 /*
-    GET /api/posts
+    GET /api/posts?username=&tag=&page=
 */
 export const list = async (ctx) => {
   // query는 문자열이기 때문에 숫자로 변환해 주어야 한다.
@@ -73,14 +97,22 @@ export const list = async (ctx) => {
     return;
   }
 
+  // 특정 사용자가 작성한 포스트만 조회하거나 특정 태그가 있는 포스트만 조회하는 기능.
+  const { tag, username } = ctx.query;
+  // tag, username 값이 유효하면 객체 안에 넣고, 그렇지 않으면 넣지 않음
+  const query = {
+    ...(username ? { 'user.username': username } : {}),
+    ...(tag ? { tags: tag } : {}),
+  }; // query를 선언한 이 코드는 username 혹은 tag 값이 유효할 때만 객체 안에 해당 값을 넣겠다는 것을 의미한다.
+
   try {
-    const posts = await Post.find()
+    const posts = await Post.find(query)
       .sort({ _id: -1 }) // sort 함수의 파라미터는 { key: 1 } 형식으로 넣는데 key는 정렬할 필드를 설정하는 부분이고, 1은 오름차순, -1은 내림수찬수을 정렬한다.
       .limit(10) // sort 함수의 파라미터는 { key: 1 } 형식으로 넣는데 key는 정렬할 필드를 설정하는 부분이고, 1은 오름차순, -1은 내림수찬수을 정렬한다.
       .skip((page - 1) * 10) // 1페이지에는 처음 10개를 불러오고, 2페이지에는 그다음 열 개를 불러온다.
       .lean() // 데이터를 처음부터 JSON 형태로 조회할 수 있다.
       .exec(); // find 함수를 호출한 후에는 exec()를 붙여 주어야 서버에 쿼리를 요청한다.
-    const postCount = await Post.countDocuments().exec();
+    const postCount = await Post.countDocuments(query).exec();
     ctx.set('Last-Page', Math.ceil(postCount / 10));
     // Last-Page라는 커스텀 HTTP 헤더를 설정하는 방법을 통해 마지막 페이지를 알 수 있다. Math.ceil 함수는 수를 올림해주는 함수이다.
     ctx.body = posts.map((post) => ({
@@ -96,18 +128,9 @@ export const list = async (ctx) => {
 /*
     GET /api/posts/:id
 */
-export const read = async (ctx) => {
-  const { id } = ctx.params;
-  try {
-    const post = await Post.findById(id).lean().exec();
-    if (!post) {
-      ctx.status = 404; // Not Found
-      return;
-    }
-    ctx.body = post;
-  } catch (e) {
-    ctx.throw(500, e);
-  }
+// id로 포스트를 찾는 코드를 getPostById 미들웨어로 구현해서 read 함수에선 간소화 한다.
+export const read = (ctx) => {
+  ctx.body = ctx.state.post;
 };
 
 /*
