@@ -1,7 +1,8 @@
 import styled, { css } from 'styled-components';
+import { Link } from 'react-router-dom';
 import palette from '../../lib/styles/palette';
 
-const StyledButton = styled.button`
+const buttonStyle = styled.button`
   border: none;
   border-radius: 4px;
   font-size: 1rem;
@@ -37,7 +38,27 @@ const StyledButton = styled.button`
     `}
 `;
 
-const Button = (props) => <StyledButton {...props} />;
+const StyledButton = styled.button`
+  ${buttonStyle}
+`;
+
+const StyledLink = styled(Link)`
+  ${buttonStyle}
+`;
+
+const Button = (props) => {
+  return props.to ? (
+    <StyledLink {...props} cyan={props.cyan ? 1 : 0} />
+  ) : (
+    // props.cyan 값을 숫자 1과 0으로 변환해 준 이유는 styled() 함수로 감싸서 만든
+    // 컴포넌트의 경우에는 임의 props가 필터링되지 않기 때문이다.
+    // 필터링이 되지 않으면 cyan={true}라는 값이 Link에서 사용하는 a 태그에 그대로 전달되는데,
+    // a 태그는 boolean 값이 임의 props로 설정되는 것을 허용하지 않는다. 숫자/문자열만 허용하기
+    // 때문에 삼항 연산자를 사용하여 boolean을 숫자로 변환해 준 것이다.
+    <StyledButton {...props} />
+  );
+};
+
 // Button이 받아 오는 props를 모두 StyledButton에 전달한다는 의미이다.
 
 export default Button;
