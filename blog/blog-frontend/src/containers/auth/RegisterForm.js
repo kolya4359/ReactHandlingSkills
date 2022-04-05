@@ -2,13 +2,15 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { changeField, initializeForm, register } from '../../modules/auth';
 import AuthForm from '../../components/auth/AuthForm';
+import { check } from '../../modules/user';
 
 const RegisterForm = () => {
   const dispatch = useDispatch();
-  const { form, auth, authError } = useSelector(({ auth }) => ({
+  const { form, auth, authError, user } = useSelector(({ auth, user }) => ({
     form: auth.register,
     auth: auth.auth,
     authError: auth.authError,
+    user: user.user,
   }));
   // 인풋 변경 이벤트 핸들러
   const onChange = (e) => {
@@ -50,10 +52,19 @@ const RegisterForm = () => {
     if (auth) {
       console.log('회원가입 성공');
       console.log(auth);
+      dispatch(check());
     }
-  }, [auth, authError]);
+  }, [auth, authError, dispatch]);
   // 결과를 얻었을 때 특정 작업을 하기 위해 useEffect를 사용했다. useEffect에 넣어 준 함수는
   // auth 값 혹은 authError 값 중에서 무엇이 유효한지에 따라 다른 작업을 한다.
+
+  //user 값이 잘 설정되었는지 확인
+  useEffect(() => {
+    if (user) {
+      console.log('check API 성공');
+      console.log(user);
+    }
+  }, [user]);
 
   return (
     <AuthForm

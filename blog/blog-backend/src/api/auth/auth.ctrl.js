@@ -20,6 +20,7 @@ export const register = async (ctx) => {
   if (result.error) {
     ctx.status = 400;
     ctx.body = result.error;
+    return;
   }
 
   const { username, password } = ctx.request.body;
