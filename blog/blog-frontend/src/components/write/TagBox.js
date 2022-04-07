@@ -143,3 +143,8 @@ export default TagBox;
  * React.memo를 사용해서 컴포넌트들을 감싸주면, 해당 컴포넌트가 받아 오는 props가 실제로
  * 바뀌었을 때만 리렌더링해 준다.
  */
+/**
+ * setLocalTags를 호출해야 하는 상황에서 onChangeTags도 함께 호출했다. 또한, props로 받아온 tags가 바뀔 때
+ * setLocalTags를 호출한다. 이로써 TagBox 컴포넌트 내부에서 상태가 바뀌면 리덕스 스토어에도 반영되고,
+ * 리덕스 스토어에 있는 값이 바뀌면 TagBox 컴포넌트 내부의 상태도 바뀌게 된다.
+ */
