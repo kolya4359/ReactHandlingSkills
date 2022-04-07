@@ -1,7 +1,5 @@
 // 스키마 생성
-import mongoose from 'mongoose';
-
-const { Schema } = mongoose;
+import mongoose, { Schema } from 'mongoose';
 
 const PostSchema = new Schema({
   title: String,

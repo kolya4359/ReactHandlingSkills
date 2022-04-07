@@ -8,8 +8,8 @@ const { ObjectId } = mongoose.Types;
 // id로 포스트를 찾은 후 ctx.state에 담는다. -> 작성자만 포스트를 수정하거나 삭제할 수 있게 하도록 하기 위해서
 export const getPostById = async (ctx, next) => {
   const { id } = ctx.params;
-  if (!ObjectId.isVlaid(id)) {
-    ctx.status = 400; // Bad Request
+  if (!ObjectId.isValid(id)) {
+    ctx.status = 400; //Bad Request
     return;
   }
   try {

@@ -45,25 +45,38 @@ const PostContent = styled.div`
   color: ${palette.gray[8]};
 `;
 
-const PostViewer = () => {
+const PostViewer = ({ post, error, loading }) => {
+  // 에러 발생 시
+  if (error) {
+    if (error.response && error.response.status === 404) {
+      return <PostViewerBlock>존재하지 않는 포스트입니다.</PostViewerBlock>;
+    }
+    return <PostViewerBlock>오류 발생!</PostViewerBlock>;
+  }
+
+  // 로딩 중이거나 아직 포스트 데이터가 없을 때
+  if (loading || !post) {
+    return null;
+  }
+  const { title, body, user, publishedDate, tags } = post;
   return (
     <PostViewerBlock>
       <PostHead>
-        <h1>제목</h1>
+        <h1>{title}</h1>
         <SubInfo>
           <span>
-            <b>tester</b>
+            <b>{user.username}</b>
           </span>
-          <span>{new Date().toLocaleDateString()}</span>
+          <span>{new Date(publishedDate).toLocaleDateString()}</span>
         </SubInfo>
         <Tags>
-          <div className="tag">#태그1</div>
-          <div className="tag">#태그2</div>
-          <div className="tag">#태그3</div>
+          {tags.map((tag) => (
+            <div className="tag">#{tag}</div>
+          ))}
         </Tags>
       </PostHead>
       <PostContent
-        dangerouslySetInnerHTML={{ __html: '<p>HTML <b>내용</b>입니다.</p>' }}
+        dangerouslySetInnerHTML={{ __html: body }}
         // 리액트에서는 <div>{html}</div>와 같이 HTML을 그대로 렌더링하는 형태로 JSX를 작성하면 HTML태그가
         // 적용되지 않고 일반 텍스트 형태로 나타나 버린다. 따라서 HTML을 적용하고 싶다면 dangerouslySetInnerHTML이라는 props를 설정해 주어야 한다.
       />
