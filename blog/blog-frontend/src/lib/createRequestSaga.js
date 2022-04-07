@@ -35,6 +35,9 @@ export default function createRequestSaga(type, request) {
       yield put({
         type: SUCCESS,
         payload: response.data,
+        meta: response,
+        // 액션 안에 meta 값을 response로 넣어 주면 나중에 HTTP 헤더 및 상태 코드를 쉽게 조회할 수 있다.
+        // HTTP 헤더 및 상태 코드는 페이지네이션을 구현하기 위해 헤더에 마지막페이지 정보를 넣어 둔 것을 조회하기 위해서이다.
       });
     } catch (e) {
       yield put({
