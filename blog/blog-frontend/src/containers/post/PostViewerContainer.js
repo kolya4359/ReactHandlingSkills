@@ -6,7 +6,7 @@ import PostViewer from '../../components/post/PostViewer';
 
 const PostViewerContainer = () => {
   // 처음 마운트될 때 포스트 읽기 API 요청
-  const { postId } = useParams;
+  const { postId } = useParams();
   // URL 파라미터로 받아 온 id 값을 조회해야 한다.
   const dispatch = useDispatch();
   const { post, error, loading } = useSelector(({ post, loading }) => ({

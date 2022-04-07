@@ -71,7 +71,9 @@ const PostViewer = ({ post, error, loading }) => {
         </SubInfo>
         <Tags>
           {tags.map((tag) => (
-            <div className="tag">#{tag}</div>
+            <div className="tag" key="_id">
+              #{tag}
+            </div>
           ))}
         </Tags>
       </PostHead>
