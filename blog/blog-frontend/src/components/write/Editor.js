@@ -63,6 +63,18 @@ const Editor = ({ title, body, onChangeField }) => {
     });
   }, [onChangeField]);
 
+  const mounted = useRef(false);
+  useEffect(() => {
+    if (mounted.current) return;
+    mounted.current = true;
+    quillInstance.current.root.innerHTML = body;
+  }, [body]);
+  // body가 변경될 때마다 useEffect에 등록한 함수가 호출된다.
+  // 하지만 컴포넌트가 화면에 마운트되고 한번만 useEffect에 등록한 작업이 실행되도록 해야 한다.
+  // 그래서 useRef를 사용하여 mount 상태에 따라 작업을 처리하도록 설정했다.
+  // 이 상황에서 useEffect의 두 번째 파라미터에 빈 배열을 넣어도 되지만, useEffectㅇ에서 사용하는 모든 외부 값을
+  // 두 번째 파라미터에 넣는 배열 안에 포함시키는 것이 권장되므로 이렇게 처리했다.
+
   const onChangeTitle = (e) => {
     onChangeField({ key: 'title', value: e.target.value });
   };
