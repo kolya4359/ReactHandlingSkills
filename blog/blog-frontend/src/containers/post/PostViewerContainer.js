@@ -6,6 +6,7 @@ import PostViewer from '../../components/post/PostViewer';
 import PostActionButtons from '../../components/post/PostActionButtons';
 import { setOriginalPost } from '../../modules/write';
 import { useNavigate } from 'react-router-dom';
+import { removePost } from '../../lib/api/posts';
 
 const PostViewerContainer = () => {
   const navigate = useNavigate();
@@ -35,6 +36,15 @@ const PostViewerContainer = () => {
     navigate('/write');
   };
 
+  const onRemove = async () => {
+    try {
+      await removePost(postId);
+      navigate('/'); // 홈으로 이동
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   // 현재 사용자가 보고 있는 포스트가 자신의 포스트일 때만 나타나는 설정
   const ownPost = (user && user._id) === (post && post.user._id);
 
@@ -43,7 +53,9 @@ const PostViewerContainer = () => {
       post={post}
       loading={loading}
       error={error}
-      actionButtons={ownPost && <PostActionButtons onEdit={onEdit} />}
+      actionButtons={
+        ownPost && <PostActionButtons onEdit={onEdit} onRemove={onRemove} />
+      }
     />
   );
 };
